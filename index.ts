@@ -6,6 +6,10 @@ import path from 'path';
 import { PORT, connectDb as connectMongoDB } from "./config";
 import http from "http";
 import CoinRouter from "./routes/CoinRoute";
+import TokenRouter from "./routes/TokenRoute";
+import AnalyticsRouter from "./routes/AnalyticsRoute";
+import WalletRouter from "./routes/WalletRoute";
+import { socketio } from "./socket/socketServer";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -30,19 +34,40 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 const server = http.createServer(app);
 
+// Initialize Socket.IO
+socketio(server);
+
 // Define routes for different API endpoints
-app.use("/token", CoinRouter);
+app.use("/token", CoinRouter); // Legacy route
+app.use("/api/tokens", TokenRouter); // New token routes
+app.use("/api/analytics", AnalyticsRouter); // Analytics routes
+app.use("/api/wallets", WalletRouter); // Wallet routes
 
-// Define a route to check if the backend server is running
+// Health check endpoint
 app.get("/", async (req: any, res: any) => {
-  res.send("Axiom Api Backend Server is Running now!");
+  res.json({
+    status: true,
+    message: "Trading Platform Backend API is running!",
+    version: "1.0.0",
+    endpoints: {
+      tokens: "/api/tokens",
+      analytics: "/api/analytics",
+      wallets: "/api/wallets"
+    }
+  });
 });
-app.get("/get_vanity", async (req: any, res: any) => {
 
-  res.send("Axiom Api Backend Server is Running now!");
+app.get("/health", async (req: any, res: any) => {
+  res.json({
+    status: true,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Start the Express server to listen on the specified port
 server.listen(PORT, () => {
-  console.log(`Axiom Api server is running on port ${PORT}`);
+  console.log(`🚀 Trading Platform Backend API server is running on port ${PORT}`);
+  console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`🔌 WebSocket server ready for real-time updates`);
 });

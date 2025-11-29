@@ -1,7 +1,7 @@
 {
-  "name": "Axiom-Api-backend",
+  "name": "trading-platform-backend",
   "version": "1.0.0",
-  "description": "Axiom-Api-Backend",
+  "description": "Trading Platform Backend API - Real-time token analytics, wallet tracking, and portfolio management for Solana",
   "main": "index.ts",
   "author": "Keidev",
   "pre-commit": [
